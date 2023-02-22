@@ -1,0 +1,42 @@
+<html>
+	<head>
+		<title>Element selection example</title>
+	</head>
+	<body>
+        <form id="myform">
+            <label for="form-num1-input">first number</label>
+            <input type="text" name="form-num1-input" id="num1-input" placeholder="enter number">
+            <label for="form-num2-input">second number</label>
+            <input type="text" name="form-num2-input" id="num2-input" placeholder="enter number">
+            <button type="submit">Submit</button>
+        </form>
+        <div id="myDiv">
+
+        </div>
+        <script>
+
+            function formValidator(event){
+                event.preventDefault();
+                const num1 = parseInt(document.getElementById("num1-input").value);
+                const num2 = parseInt(document.getElementById("num2-input").value);
+                if( num1 == "" || num2 == ""){
+                    alert("Inputs cannot be null");
+                }
+                else if (isNaN(num1) || isNaN(num2)){
+                    alert("Please input valid numbers")
+                }
+                else{
+                    const para = document.createElement("p");
+                    const node = document.createTextNode(num1 + "+" + num2 + "=" + (num1+num2));
+                    para.appendChild(node);
+
+                    const element = document.getElementById("myDiv");
+                    element.appendChild(para);
+                }
+            }
+
+            let myform = document.getElementById("myform"); // get the form 
+            myform.addEventListener('submit', formValidator); // bind the validator function to the submit button for the form
+        </script>
+	</body>
+</html>

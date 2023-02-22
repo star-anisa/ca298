@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<head></head>
+<body>
+    <ul id="planet-info"></ul>
+    <script>
+        fetch("https://swapi.dev/api/planets/1")
+        .then(response => response.json())
+        .then(data=>{ 
+            const planetName = data.name;
+            const diameter = data.diameter;
+            const climate = data.climate;
+            const terrain = data.terrain;
+            const population = data.population;
+
+            const planetInfoList = document.getElementById('planet-info');
+			planetInfoList.innerHTML = `
+                <li>Name: ${planetName}</li>
+                <li>Diameter: ${diameter}</li>
+                <li>Climate: ${climate}</li>
+                <li>Terrain: ${terrain}</li>
+                <li>Population: ${population}</li>
+			`;
+        })
+
+</script>
+</body>
