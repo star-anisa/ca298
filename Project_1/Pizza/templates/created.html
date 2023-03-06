@@ -1,0 +1,29 @@
+<!--created.html-->
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+<br>
+<div class="container">
+	<div class="row">
+
+		<div class="center"><h4><p>Thanks {{ name }}, Your order is complete!</p></h4>
+			<p>Your pizza is being prepared by our pizza experts!</p>
+			<img src="{% static 'Pizza/pizzadeliveryalien.png' %}" width="30%" alt="">
+			<p>Your order will be ready in approx. 30 minutes.</p>
+			<hr>
+			<p><b>Your order details:</b></p>
+			<p>One {{ pizza.size }} pizza with {{pizza.crust}} crust, {{pizza.sauce}} sauce and {{ pizza.cheese }} cheese.</p>
+			<p>Toppings included:</p>
+			<p>{% if pizza.pepperoni %} Pepperoni {% endif %}</p>
+			<p>{% if pizza.chicken %} Chicken {% endif %}</p>
+			<p>{% if pizza.ham %} Ham {% endif %}</p>
+			<p>{% if pizza.pineapple %} Pineapple {% endif %}</p>
+			<p>{% if pizza.peppers %} Peppers {% endif %}</p>
+			<p>{% if pizza.mushrooms %} Mushrooms {% endif %}</p>
+			<p>{% if pizza.onions %} Onions {% endif %}</p>
+			<p>{% if pizza.olives %} Olives {% endif %}</p>	
+		</div>
+	</div>
+</div>
+<br>
+{% endblock %}

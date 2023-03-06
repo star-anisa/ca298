@@ -1,0 +1,93 @@
+<!-- index.html -->
+
+{% extends 'base.html' %}
+
+{% block content %}
+<br>
+<div class="container">
+    <div class="center">
+        <h3>Create Your Own Pizza</h3>
+    </div>
+    <br>
+    <form  method="POST">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-25">
+              <label>Size</label>
+            </div>
+            <div class="col-75">
+              {{ form.size }}
+              {{ form.size.errors }}
+            </div>
+          </div>
+        <div class="row">
+            <div class="col-25">
+              <label>Crust</label>
+            </div>
+            <div class="col-75">
+              {{ form.crust }}
+              {{ form.crust.errors }}
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-25">
+              <label>Sauce</label>
+            </div>
+            <div class="col-75">
+              {{ form.sauce }}
+              {{ form.sauce.errors }}
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-25">
+              <label>Cheese</label>
+            </div>
+            <div class="col-75">
+              {{ form.cheese }}
+              {{ form.cheese.errors }}
+            </div>
+          </div>
+          <br>
+          <div class="row">
+            <h4>Toppings</h4>
+          </div>
+          <div class="col-25">
+            <label>Pepperoni</label>
+            {{form.pepperoni}}
+          </div>
+          <div class="col-25">
+            <label>Chicken</label>
+            {{form.chicken}}
+          </div>
+          <div class="col-25">
+            <label>Ham</label>
+            {{form.ham}}
+          </div>
+          <div class="col-25">
+            <label>Pineapple</label>
+            {{form.pineapple}}
+          </div>
+          <div class="col-25">
+            <label>Peppers</label>
+            {{form.peppers}}
+          </div>
+          <div class="col-25">
+            <label>Mushroom</label>
+            {{form.mushrooms}}
+          </div>
+          <div class="col-25">
+            <label>Onion</label>
+            {{form.onions}}
+          </div>
+          <div class="col-25">
+            <label>Olives</label>
+            {{form.olives}}
+          </div>
+          <br>
+          <div class="row">
+        <button type="submit">Create Pizza</button>
+        </div>
+    </form>
+</div>
+<br>
+{% endblock %}
