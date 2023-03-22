@@ -1,0 +1,25 @@
+<html>
+	<head></head>
+	<body>
+		<div id="container"></div>
+		<script>
+			function showAllBooks(){
+				let container = document.getElementById("container"); // load the container
+				container.innerHTML = ""; // delete the content already inside the container
+
+				let req = "http://127.0.0.1:8000/api/book/"
+					fetch(req) // make a request to this endpoint
+						.then(response => response.json()) // with our response, get the json data returned
+						.then(data =>{  // print the json data
+							container.innerHTML+=`<ol id="book-list"></ol>`; // create an empty list 
+							data.forEach(elem=>{
+								let bookList = document.getElementById("book-list"); // load the book lsit we just created
+								let bookString = `<li>${elem.title} - ${elem.author}</li>`; // create a new li element containing info on our book
+								bookList.innerHTML += bookString; // add the li element to the list of books
+							})
+						}); 
+				}
+				showAllBooks();// call the function  
+			</script>
+		</body>
+</html>
