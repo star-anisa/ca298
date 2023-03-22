@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}
+    <title> {{ book.title }} </title><!-- the page title goes here --> 
+{% endblock %}
+
+{% block content %}
+    <div class="card mb-3">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/1/1d/P_literature.svg", padding="5%", class="card-img-top" alt="placeholder image">
+        <div class="card-body">
+        <h5 class="card-title">{{ book.title }}</h5>
+        <h6 class="card-title">Written by {{ book.author }}</h6>
+        <h6 class="card-title">{{ book.year }}</h6>
+        <p class="card-text">Genre is {{ book.genre }}</p>
+        <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+        </div>
+    </div>
+
+    <b>Currently Borrowed By:</b>
+    <div class="card-deck">
+
+        {% for b in not_returned %}
+            <p class="card-text"> {{ b.customer.name }} </p>
+        {% endfor %}
+
+{% endblock %}
