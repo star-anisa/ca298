@@ -15,9 +15,11 @@
 						let bookAuthor = `<li>${data.author}</li>`;
 						let bookTitle = `<li>${data.title}</li>`;
 						let bookDesc = `<li>${data.genre}</li>`;
+						let backButton = `<button  onclick="showAllBooks()"> Back </button> </li>`;
 						bookInfo.innerHTML += bookAuthor;
 						bookInfo.innerHTML += bookTitle;
 						bookInfo.innerHTML += bookDesc;
+						bookInfo.innerHTML += backButton;
 						});
 				}
 
