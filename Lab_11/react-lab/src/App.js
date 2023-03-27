@@ -3,6 +3,7 @@ import './App.css';
 import HeadingComponent from './components/heading';
 import MyButton from './components/button';
 import Counter from './components/counter';
+import CatFacts from './components/catfacts';
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
 	  	<HeadingComponent name="Anisa"/>
 		<MyButton />
 		<Counter />
+		<CatFacts />
         <img src={logo} className="App-logo" alt="logo" />
         <p>
           Edit <code>src/App.js</code> and save to reload.
