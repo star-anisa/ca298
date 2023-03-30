@@ -4,6 +4,8 @@ import HeadingComponent from './components/heading';
 import MyButton from './components/button';
 import Counter from './components/counter';
 import CatFacts from './components/catfacts';
+import BookList from './components/booklist';
+import Singlebook from './components/singlebook';
 
 function App() {
   return (
@@ -13,6 +15,8 @@ function App() {
 		<MyButton />
 		<Counter />
 		<CatFacts />
+		<BookList/>
+		<Singlebook number = "2" />
         <img src={logo} className="App-logo" alt="logo" />
         <p>
           Edit <code>src/App.js</code> and save to reload.
