@@ -1,0 +1,98 @@
+<html>
+	<head></head>
+	<body>
+		<div id="container"></div>
+		
+		<script>
+			function viewSingleBook(id){
+				let container = document.getElementById("container"); // load the container
+				container.innerHTML = ""; // delete the content already inside the container  
+				let req = `http://127.0.0.1:8000/api/book/${id}/`;
+				fetch(req) // make a request to this endpoint
+					.then(response => response.json()) // with our response, get the json data returned
+					.then(data =>{ 
+						container.innerHTML += `<ul id="book-info"></ul>`;
+						let bookInfo = document.getElementById("book-info");
+						let bookAuthor = `<li>${data.author}</li>`;
+						let bookTitle = `<li>${data.title}</li>`;
+						let bookDesc = `<li>${data.genre}</li>`;
+						let backButton = `<button  onclick="showAllBooks()"> Back </button> </li>`;
+						bookInfo.innerHTML += bookAuthor;
+						bookInfo.innerHTML += bookTitle;
+						bookInfo.innerHTML += bookDesc;
+						bookInfo.innerHTML += backButton;
+						});
+				}
+
+
+			function showAllBooks(){
+				let container = document.getElementById("container"); // load the container
+				container.innerHTML = ""; // delete the content already inside the container
+
+				let req = "http://127.0.0.1:8000/api/book/"
+					fetch(req) // make a request to this endpoint
+						.then(response => response.json()) // with our response, get the json data returned
+						.then(data =>{  // print the json data
+							container.innerHTML+=`<ol id="book-list"></ol>`; // create an empty list 
+							let bookList = document.getElementById("book-list"); // load the book lsit we just created
+
+							data.forEach(elem=>{
+								let bookString = `<li>${elem.title} - ${elem.author} <button  onclick="viewSingleBook(${elem.id})"> More info </button> </li>`; // create a new li element containing info on our book
+								bookList.innerHTML += bookString; // add the li element to the list of books
+							})
+							bookList.innerHTML += `<button onclick="createNewBook()"> New Book? </button>`;
+						}); 
+				}
+
+			function createNewBook(bookid){
+				let container = document.getElementById("container");  // load the container
+					container.innerHTML = ""; // Deleting anything already in the container div
+					container.innerHTML += `<form id="form"></form>`;
+				let form = document.getElementById("form");
+	
+					form.innerHTML += `<label for="title">Title:</label> <input id="title" type="text" required><br>`;
+					form.innerHTML += `<label for="genre">Genre:</label> <input id="genre" type="text" required><br>`;
+					form.innerHTML += `<label for="year">Year:</label> <input id="year" type="text" required><br>`;
+					form.innerHTML += `<label for="author">Author:</label> <input id="author" type="text" required><br>`;
+					form.innerHTML += `<label for="inventory">Inventory:</label> <input id="inventory" type="text" required><br>`;
+					form.innerHTML += `<button type="submit">Submit</button>`;
+
+				form.addEventListener("submit", (e)=>{
+                	e.preventDefault();
+
+
+					data = {
+						"title": form.title.value,
+						"genre": form.genre.value,
+						"year": form.year.value, 
+						"author": form.author.value, 
+						"inventory": form.inventory.value
+					};
+                	console.log(data);
+
+                	fetch("http://127.0.0.1:8000/api/book/", {
+                	method: "POST",
+                	headers: {
+                    	"Content-Type": "application/json",
+                		},
+                	body: JSON.stringify(data),
+                		})
+
+                .then((response) => response.json())
+                .then((data) => {
+                    console.log("Success:", data);
+                    window.location.reload();
+                })     
+                .catch((error) => {
+                    console.error("Error:", error);
+                    window.location.reload();   // Refreshes the page automatically
+                });
+            });
+        }
+
+
+				showAllBooks();// call the function
+
+			</script>
+		</body>
+</html>

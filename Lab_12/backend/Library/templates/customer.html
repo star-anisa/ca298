@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}
+<title>{{ cust.name }}</title>
+{% endblock %}
+
+{% block content %}
+<br>
+<h3 style="padding-left:5px;">Hi, {{ cust.name }}</h3>
+<hr>
+<h4><p style="padding-left:5px;">Currently Borrowing</p></h4>
+
+
+{% for b in not_returned %}
+<div class="card" style="width: 18rem; height:24rem; float:none;">
+    <div class="card-body">
+        <h4 class="card-text">{{ b.book.title }}</h4>
+        <p class="card-text"><b>Author: </b>{{b.book.author}} <br> </p>
+        <p class="card-text"><b>Due Date: </b>{{b.due_date}} <br> </p>
+        <p class="card-text"><b>Return Status: </b> Not Returned</p> <!--{{b.is_returned}}-->
+        <p class="card-text"><b> Customer Name: </b>{{b.customer.name}}</p>
+    </div>
+</div>
+
+{% endfor %}
+<h4><p style="padding-left:5px;">Previously Borrowed</p></h4>
+
+
+{% for b in returned %}
+<div class="card" style="width: 18rem; height:24rem; float:none;">
+    <div class="card-body">
+        <h4 class="card-text">{{ b.book.title }}</h4>
+        <p class="card-text"><b>Author: </b>{{b.book.author}} <br> </p>
+        <p class="card-text"><b>Due date: </b>{{b.due_date}} <br> </p>
+        <p class="card-text"><b>Return Status: </b>Returned</p>
+        <p class="card-text"><b> Customer Name: </b>{{b.customer.name}}</p>
+    </div>
+</div>
+
+{% endfor %}
+{% endblock %}
