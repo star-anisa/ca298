@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Univeristy API</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+	<link rel='stylesheet' href='/stylesheets/style.css' />
+</head>
+
+<body>
+
+	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+		integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+		crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"
+		integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+		crossorigin="anonymous"></script>
+	<header>
+		<div class="tabbable">
+			<ul class="nav nav-tabs">
+				<li class="nav-item">
+					<a href="" class="nav-link active" data-toggle="tab" onclick="showAllDegrees()">Degrees</a>
+				</li>
+				<li class="nav-item">
+					<a href="" class="nav-link" data-toggle="tab" onclick="showAllCohorts()">Cohorts</a>
+				</li>
+				<li class="nav-item">
+					<a href="" class="nav-link" data-toggle="tab" onclick="showAllModules()">Modules</a>
+				</li>
+				<li class="nav-item">
+					<a href="" class="nav-link" data-toggle="tab" onclick="createNewDegree()">Create
+						Degree</a>
+				</li>
+				<li class="nav-item">
+					<a href="" class="nav-link" data-toggle="tab" onclick="createNewModule()">Create
+						Modules</a>
+				</li>
+				<li class="nav-item">
+					<a href="" class="nav-link" data-toggle="tab" onclick="createNewCohort()">Create
+						Cohort</a>
+				</li>
+				<li class="nav-item">
+					<a href="" class="nav-link" data-toggle="tab" onclick="createNewStudent()">Create New
+						Student</a>
+				</li>
+				<li class="nav-item">
+					<a href="" class="nav-link" data-toggle="tab" onclick="setGrades()">Set Grades</a>
+				</li>
+		</ul>
+		<form class="form-inline ml-auto">
+			<input class="form-control" type="search" placeholder="Enter student number" aria-label="Search" id="student-id-input">
+			<button class="btn mybtn" type="submit" id="search-btn">Search</button>
+		</form>
+		<hr>
+		</div>
+
+		<div id="container"></div>
+
+		<script>
+
+			function showAllDegrees() {
+				let container = document.getElementById("container");
+				container.innerHTML = ""; // delete everything in container
+				let req = "http://127.0.0.1:8000/api/degree/"
+				fetch(req) // make a request to this endpoint
+					.then(resp => resp.json()) // with our resp, get the json data returned
+					.then(data => {
+						data.forEach(degree => {
+							let cardHtml = `<div class="card">
+								<h2 class="card-header">${degree.shortcode}</h2>
+								<div class="card-body">
+									<p class="card-title">${degree.full_name}</p>
+									<button class="btn btn-primary" onclick="viewSingleDegree('${degree.shortcode}')">View</button>
+								</div>`;
+							container.innerHTML += cardHtml;
+						});
+
+					});
+			}
+
+			function viewSingleDegree(shortcode) {
+				let container = document.getElementById("container");
+				container.innerHTML = ""; // delete everything in container
+
+				let degreeReq = `http://127.0.0.1:8000/api/degree/${shortcode}`;
+				let cohortReq = `http://127.0.0.1:8000/api/cohort/?degree=${shortcode}`;
+
+				Promise.all([fetch(degreeReq), fetch(cohortReq)])
+					.then(resps => Promise.all(resps.map(resp => resp.json())))
+					.then(data => {
+						let degree = data[0];
+						let cohort = data[1];
+
+						const degreeHtml = `<div class="card" style="width: 18rem;"><div class="card-header"><h3>Cohorts in ${degree.full_name}</h3>${degree.shortcode}</div>`;
+						let cohortHtml = `<ul class="list-group list-group-flush">`;
+						cohort.forEach(cohort => {
+							cohortHtml += `<li class="list-group-item">${cohort.name}</li>`;
+						});
+						cohortHtml += `</ul></div>`;
+						container.innerHTML = degreeHtml + cohortHtml;
+					})
+					.catch(error => {
+						console.error("Error retrieving data:", error);
+					});
+			}
+
+
+
+			function createNewDegree() {
+				let container = document.getElementById("container");  // load the container
+				container.innerHTML = ""; // delete everything in container
+				container.innerHTML += `<form id="form"></form>`;
+				let degreeForm = document.getElementById("form");
+
+				degreeForm.innerHTML += `<label for="full_name"><strong>Title:</strong></label> <input id="full_name" type="text"><br>`;
+				degreeForm.innerHTML += `<label for="shortcode"><strong>Shortcode:</strong></label> <input id="shortcode" type="text"><br>`;
+				degreeForm.innerHTML += `<button class = "btn" type="submit">Submit</button>`;
+
+				degreeForm.addEventListener("submit", (e) => {
+					e.preventDefault();
+					//todo: load variables from the form
+					// take variables and construct JSON object
+
+					data = {
+						"full_name": degreeForm.full_name.value,
+						"shortcode": degreeForm.shortcode.value,
+					};
+					console.log(data);
+
+					// send as a POST request to http://127.0.0.1:8000/api/books/
+					fetch("http://127.0.0.1:8000/api/degree/", {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify(data),
+					})
+
+						.then((resp) => resp.json())
+						.then((data) => {
+							console.log("Success:", data);
+						})
+						.catch((error) => {
+							console.error("Error:", error);
+						});
+				});
+			}
+
+			function showAllCohorts() {
+				let container = document.getElementById("container"); // load the container
+				container.innerHTML = ""; // delete everything in container
+				let req = "http://127.0.0.1:8000/api/cohort/";
+				fetch(req) // make a request to this endpoint
+					.then((resp) => resp.json()) // with our resp, get the json data returned
+					.then((data) => {
+						data.forEach((cohort) => {
+							let cardHtml = `<div class="card">
+								<h2 class="card-header">${cohort.id}</h2>
+								<div class="card-body">
+									<p class="card-title">${cohort.name}</p>
+									<button class="btn" onclick="viewSingleCohort('${cohort.id}')">View</button>
+								</div>`;
+							container.innerHTML += cardHtml; // add the card to the container
+						});
+					});
+			}
+
+
+			function viewSingleCohort(id) {
+				let container = document.getElementById("container");
+				container.innerHTML = ""; // delete everything in container
+
+				let studentReq = `http://127.0.0.1:8000/api/student/?cohort=${id}`;
+				let moduleReq = `http://127.0.0.1:8000/api/module/?delivered_to=${id}`;
+
+				// Fetch both the student and module data in parallel using Promise.all
+				Promise.all([fetch(studentReq), fetch(moduleReq)])
+					.then(resps => Promise.all(resps.map(res => res.json())))
+					.then(data => {
+						let students = data[0];
+						let modules = data[1];
+
+						// Display the student data as before
+						container.innerHTML += `<br/><div class="card" style="width: 18rem;"><div class="card-header"><h3>Students in this cohort</h3></div>`;
+						let studentHtml = `<ul class="list-group list-group-flush">`;
+						students.forEach(student => {
+							studentHtml += `<li class="list-group-item">${student.first_name} ${student.last_name} -- (${student.student_id})</li>`;
+						});
+						studentHtml += `</ul></div>`;
+						container.innerHTML += studentHtml;
+
+						// Display the module data
+						container.innerHTML += `<br/><div class="card" style="width: 18rem;"><div class="card-header"><h3>Modules in this cohort</h3></div>`;
+						let moduleHtml = `<ul class="list-group list-group-flush">`;
+						modules.forEach(module => {
+							moduleHtml += `<li class="list-group-item">${module.full_name} -- (${module.code})</li>`;
+						});
+						moduleHtml += `</ul></div>`;
+						container.innerHTML += moduleHtml;
+					})
+					.catch(error => console.error(error));
+			}
+
+
+			function createNewCohort() {
+				let container = document.getElementById("container");
+				container.innerHTML = ""; // delete everything in container
+				container.innerHTML += `<form id="form"></form>`;
+				let cohortForm = document.getElementById("form");
+
+				cohortForm.innerHTML += `<label for="id"><strong>ID:</strong></label> <input id="id" type="text"><br>`;
+				cohortForm.innerHTML += `<label for="year"><strong>Year:</strong></label> <input id="year" type="text"><br>`;
+				cohortForm.innerHTML += `<label for="degree"><strong>Degree:</strong></label> 
+        <select id="degree"></select><br>`;
+				cohortForm.innerHTML += `<button class = "btn" type="submit">Submit</button>`;
+
+				// Populate the degree dropdown
+				fetch("http://127.0.0.1:8000/api/degree/")
+					.then((resp) => resp.json())
+					.then((data) => {
+						let degreeSelect = document.getElementById("degree");
+						data.forEach((degree) => {
+							let option = document.createElement("option");
+							option.text = degree.full_name;
+							option.value = `http://127.0.0.1:8000/api/degree/${degree.shortcode}/`;
+							degreeSelect.add(option);
+						});
+					})
+					.catch((error) => {
+						console.error("Error:", error);
+					});
+
+				cohortForm.addEventListener("submit", (e) => {
+					e.preventDefault();
+
+					// Construct the data object
+					data = {
+						"id": cohortForm.id.value,
+						"year": cohortForm.year.value,
+						"degree": cohortForm.degree.value,
+					};
+
+					// Send as a POST request to http://127.0.0.1:8000/api/cohort/
+					fetch("http://127.0.0.1:8000/api/cohort/", {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify(data),
+					})
+						.then((resp) => resp.json())
+						.then((data) => {
+							console.log("Success:", data);
+						})
+						.catch((error) => {
+							console.error("Error:", error);
+						});
+				});
+			}
+
+			function showAllModules() {
+				let container = document.getElementById("container"); // load the container
+				container.innerHTML = ""; // delete everything in container
+				let req = "http://127.0.0.1:8000/api/module/";
+				fetch(req) // make a request to this endpoint
+					.then((resp) => resp.json()) // with our resp, get the json data returned
+					.then((data) => {
+						data.forEach(module => {
+							let cardHtml = `<div class="card">
+								<h2 class="card-header">${module.code}</h2>
+								<div class="card-body">
+									<p class="card-title">Shortcode: ${module.full_name}</p>
+									<button class="btn" onclick="viewSingleModule('${module.code}')">View</button>
+								</div>`;
+							container.innerHTML += cardHtml; // add the card to the container
+						});
+					});
+			}
+
+
+
+			function viewSingleModule(code) {
+				let container = document.getElementById("container"); // load the container
+				container.innerHTML = ""; // delete everything in container
+				let req = `http://127.0.0.1:8000/api/module/${code}`
+				fetch(req) // make a request to this endpoint
+					.then(resp => resp.json()) // with our resp, get the json data returned
+					.then(data => {
+						const moduleHtml = `<h2>${data.code}</h2>
+              <p>${data.full_name}</p>
+              <p>${data.delivered_to}</p>`
+							;
+						container.innerHTML = moduleHtml;
+
+					})
+			};
+
+
+			function createNewModule() {
+				let container = document.getElementById("container");
+				container.innerHTML = ""; // delete everything in container
+				container.innerHTML += `<form id="form"></form>`;
+				let moduleForm = document.getElementById("form");
+				moduleForm.innerHTML += `<label for="code"><strong>Code:</strong></label> <input id="code" type="text"><br>`;
+				moduleForm.innerHTML += `<label for="full_name"><strong>Full Name:</strong></label> <input id="full_name" type="text"><br>`;
+
+				
+				// Load cohorts from API and create checkboxes for each cohort
+				fetch("http://127.0.0.1:8000/api/cohort/")
+					.then(resp => resp.json())
+					.then(data => {
+						let cohortCheckboxes = "";
+						data.forEach(cohort => {
+							cohortCheckboxes += `<label><input type="checkbox" name="delivered_to" value="${cohort.url}"> ${cohort.name}</label><br>`;
+						});
+						moduleForm.innerHTML += `<label><strong>Delivered To:</strong></label><br> ${cohortCheckboxes}<br>`;
+						moduleForm.innerHTML += `<button class = "btn" type="submit">Submit</button>`;
+
+					})
+					.catch(error => console.error(error));
+
+				moduleForm.innerHTML += `<label for="ca_split"><strong>Ca Split:</strong></label> <input id="ca_split" type="text"><br>`;
+				moduleForm.addEventListener("submit", (e) => {
+					e.preventDefault();
+
+					let selectedCohorts = [];
+					let checkboxes = document.getElementsByName("delivered_to");
+					checkboxes.forEach(checkbox => {
+						if (checkbox.checked) {
+							selectedCohorts.push(checkbox.value);
+						}
+					});
+
+					let data = {
+						"code": moduleForm.code.value,
+						"full_name": moduleForm.full_name.value,
+						"delivered_to": selectedCohorts,
+						"ca_split": moduleForm.ca_split.value
+					};
+					console.log(data);
+
+					fetch("http://127.0.0.1:8000/api/module/", {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify(data),
+					})
+						.then((resp) => resp.json())
+						.then((data) => {
+							console.log("Success:", data);
+
+						})
+						.catch((error) => {
+							console.error("Error:", error);
+						});
+				});
+
+			}
+
+
+			function viewSingleStudent(studentId) {
+				let container = document.getElementById("container");
+				if (!container) {
+					console.error("Container element not found.");
+					return;
+				}
+				container.innerHTML = "";
+
+				let reqStudent = `http://127.0.0.1:8000/api/student/${studentId}`;
+				let reqGrades = `http://127.0.0.1:8000/api/grade/?student=${studentId}`;
+
+				Promise.all([fetch(reqStudent), fetch(reqGrades)])
+					.then(responses => Promise.all(responses.map(resp => resp.json())))
+					.then(data => {
+						console.log("Student data:", data[0]);
+						console.log("Grade data:", data[1]);
+
+						const studentHtml = `<h2>${data[0].first_name} ${data[0].last_name} (${data[0].student_id})</h2>`;
+						let gradeHtml = "";
+						data[1].forEach(grade => {
+							gradeHtml += `<li>${grade.module} - CA mark : ${grade.ca_mark} Exam mark: ${grade.exam_mark} Total: ${grade.total_grade}</li>`;
+						});
+						gradeHtml = `<h3>Grades:</h3><ul>${gradeHtml}</ul>`;
+						container.innerHTML = studentHtml + gradeHtml;
+					})
+					.catch(error => {
+						console.error("Error retrieving data:", error);
+					});
+			}
+
+
+			document.getElementById("search-btn").addEventListener("click", function (event) {
+				event.preventDefault();
+				let studentId = document.getElementById("student-id-input").value;
+				viewSingleStudent(studentId);
+			});
+
+
+
+			function createNewStudent() {
+				let container = document.getElementById("container");  // load the container
+				container.innerHTML = ""; // delete everything in container
+				container.innerHTML += `<form id="form"></form>`;
+				let newStudentForm = document.getElementById("form");
+
+				newStudentForm.innerHTML += `<label for="first_name"><strong>First Name:</strong></label> <input id="first_name" type="text"><br>`;
+				newStudentForm.innerHTML += `<label for="last_name"><strong>Last Name:</strong></label> <input id="last_name" type="text"><br>`;
+				newStudentForm.innerHTML += `<label for="cohort"><strong>Cohort:</strong></label><select id="cohort"></select><br>`;
+				newStudentForm.innerHTML += `<button class = "btn" type="submit">Submit</button>`;
+
+				fetch("http://127.0.0.1:8000/api/cohort/")
+					.then((resp) => resp.json())
+					.then((data) => {
+						let cohortSelect = document.getElementById("cohort");
+						data.forEach((cohort) => {
+							let option = document.createElement("option");
+							option.text = cohort.name;
+							option.value = `http://127.0.0.1:8000/api/cohort/${cohort.id}/`;
+							cohortSelect.add(option);
+						});
+					})
+					.catch((error) => {
+						console.error("Error:", error);
+					});
+
+				newStudentForm.addEventListener("submit", (e) => {
+					e.preventDefault();
+					//todo: load variables from the form
+					// take variables and construct JSON object
+
+					data = {
+						"first_name": newStudentForm.first_name.value,
+						"last_name": newStudentForm.last_name.value,
+						"cohort": newStudentForm.cohort.value,
+					};
+					console.log(data);
+
+					fetch("http://127.0.0.1:8000/api/student/", {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify(data),
+					})
+
+						.then((resp) => resp.json())
+						.then((data) => {
+							console.log("Success:", data);
+						})
+						.catch((error) => {
+							console.error("Error:", error); // Refreshes the page automatically
+						});
+				});
+			}
+
+
+			function setGrades() {
+				let container = document.getElementById("container");
+				container.innerHTML = ""; // delete everything in container
+				container.innerHTML += `<form id="form"></form>`;
+				let gradeForm = document.getElementById("form");
+
+				gradeForm.innerHTML += `<label for="student"><strong>Student:</strong></label> 
+      <select id="student"></select><br>`;
+				gradeForm.innerHTML += `<label for="module"><strong>Module:</strong></label> 
+      <select id="module"></select><br>`;
+				gradeForm.innerHTML += `<label for="ca_mark"><strong>CA Mark:</strong></label> 
+      <input id="ca_mark" type="number" min="0" max="100"><br>`;
+				gradeForm.innerHTML += `<label for="exam_mark"><strong>Exam Mark:</strong></label> 
+      <input id="exam_mark" type="number" min="0" max="100"><br>`;
+				gradeForm.innerHTML += `<label for="cohort"><strong>Cohort:</strong></label> 
+      <select id="cohort"></select><br>`;
+				gradeForm.innerHTML += `<button class = "btn" type="submit">Submit</button>`;
+
+				// Populate the student dropdown
+				fetch("http://127.0.0.1:8000/api/student/")
+					.then((resp) => resp.json())
+					.then((data) => {
+						let studentSelect = document.getElementById("student");
+						data.forEach((student) => {
+							let option = document.createElement("option");
+							option.text = student.student_id;
+							option.value = `http://127.0.0.1:8000/api/student/${student.student_id}/`;
+							studentSelect.add(option);
+						});
+					})
+					.catch((error) => {
+						console.error("Error:", error);
+					});
+
+				// Populate the module dropdown
+				fetch("http://127.0.0.1:8000/api/module/")
+					.then((resp) => resp.json())
+					.then((data) => {
+						let moduleSelect = document.getElementById("module");
+						data.forEach((module) => {
+							let option = document.createElement("option");
+							option.text = module.code;
+							option.value = `http://127.0.0.1:8000/api/module/${module.code}/`;
+							moduleSelect.add(option);
+						});
+					})
+					.catch((error) => {
+						console.error("Error:", error);
+					});
+
+				// Populate the cohort dropdown
+				fetch("http://127.0.0.1:8000/api/cohort/")
+					.then((resp) => resp.json())
+					.then((data) => {
+						let cohortSelect = document.getElementById("cohort");
+						data.forEach((cohort) => {
+							let option = document.createElement("option");
+							option.text = cohort.name;
+							option.value = `http://127.0.0.1:8000/api/cohort/${cohort.id}/`;
+							cohortSelect.add(option);
+						});
+					})
+					.catch((error) => {
+						console.error("Error:", error);
+					});
+
+				gradeForm.addEventListener("submit", (e) => {
+					e.preventDefault();
+
+					// Construct the data object
+					data = {
+						"student": gradeForm.student.value,
+						"module": gradeForm.module.value,
+						"ca_mark": gradeForm.ca_mark.value,
+						"exam_mark": gradeForm.exam_mark.value,
+						"cohort": gradeForm.cohort.value,
+					};
+
+					console.log(data);
+
+					fetch("http://127.0.0.1:8000/api/grade/", {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify(data),
+					})
+
+						.then((resp) => resp.json())
+						.then((data) => {
+							console.log("Success:", data);
+						})
+						.catch((error) => {
+							console.error("Error:", error); // Refreshes the page automatically
+						});
+				})
+			}
+
+
+
+
+		</script>
+</body>
+
+</html>
